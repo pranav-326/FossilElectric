@@ -129,19 +129,20 @@ def build_slides(rows):
     slides.append(s)
 
     # 3. Preparation and honest scope
-    s = Slide("Preparation and analytical scope", "The saved clean file is the shared basis for the notebook and dashboard.")
+    s = Slide("Preparation and analytical scope", "A reproducible build turns the selected-column source into the country-year analysis table.")
     bullet_list(s, 0.9, 2.02, 5.5, [
-        "Repaired formatting artifacts in column names.",
-        "Converted year and analysis fields to numeric values.",
-        "Trimmed country labels; removed rows without country or year.",
-        "Kept the country-year grain for comparisons over time.",
-    ], size=15, gap=0.77)
+        "1,200 source rows become 400 country-year rows across 25 countries.",
+        "Each country-year has three source records; the file has no segment key explaining them.",
+        "Vehicle sales are summed; shared metrics are kept once only where all three agree.",
+        "Derived total sales, EV share and year-over-year growth are recalculated.",
+    ], size=14, gap=0.82)
     s.line(6.7, 1.98, 6.7, 5.92, LINE, 1.2)
     s.text(7.08, 2.04, 5.25, 0.4, "DATA CHECKS", 11, BLUE, bold=True)
-    s.text(7.08, 2.50, 5.15, 0.65, "No missing country or year values in the saved 400-row file.", 16, INK, bold=True)
-    s.text(7.08, 3.48, 5.15, 0.72, "25 missing values in ev_growth_rate_yoy; the current views do not use that field.", 14, MUTED)
-    s.text(7.08, 4.57, 5.15, 0.88, "Country means are unweighted. Country-level patterns do not establish that charging access causes EV adoption or emissions changes.", 14, INK)
-    s.text(0.9, 6.25, 11.1, 0.34, "Pipeline files: CleanData.ipynb  →  ev_vs_petrol_dataset_cleaned.csv  →  Graph.ipynb / app.py", 11.5, MUTED)
+    s.text(7.08, 2.50, 5.15, 0.68, "0 exact duplicate rows; 0 missing country/year identifiers; 0 negative sales values.", 15, INK, bold=True)
+    s.text(7.08, 3.43, 5.15, 0.78, "25 missing growth values are the first year for each country, where no prior year exists.", 14, MUTED)
+    s.text(7.08, 4.48, 5.15, 0.96, "IQR flags 50 market-share, 39 station-count, 32 emissions and 46 EV-sales candidates; none are deleted without evidence.", 13, INK)
+    s.rect(0.9, 5.92, 11.3, 0.58, "FFF3D8")
+    s.text(1.08, 6.00, 10.95, 0.38, "Verify the meaning of the three source records per country-year before treating their sales sum as valid.", 12, INK, bold=True)
     footer(s, 3)
     slides.append(s)
 
@@ -200,8 +201,9 @@ def build_slides(rows):
         s.text(bx + bw * val / 85 + 0.12, y - 0.04, 0.95, 0.34, f"{val:.2f}%", 12, INK, bold=True)
     s.text(10.25, 2.16, 2.2, 0.55, "79.96%", 22, BLUE, bold=True)
     s.text(10.25, 2.75, 2.15, 0.66, "Norway led the 2025 sample.", 13, MUTED)
-    s.text(10.25, 4.30, 2.25, 0.85, "Sweden 53.00%\nChina 41.23%", 13, INK)
-    s.text(0.95, 6.45, 11.2, 0.32, "A country ranking describes reported market shares; it does not explain why countries differ.", 12, MUTED)
+    s.text(10.25, 4.20, 2.25, 0.50, "ρ = 0.88", 21, BLUE, bold=True)
+    s.text(10.25, 4.78, 2.35, 1.10, "Spearman rank association for 375 country-years with positive station counts.", 12, MUTED)
+    s.text(0.95, 6.45, 11.2, 0.32, "Country and time differences may confound the pooled association; it is not causal evidence.", 12, MUTED)
     footer(s, 6)
     slides.append(s)
 
@@ -216,11 +218,12 @@ def build_slides(rows):
     s.line(6.65, 1.98, 6.65, 5.92, LINE, 1.2)
     s.text(7.02, 2.02, 5.3, 0.4, "BEFORE SUBMISSION", 11, ORANGE, bold=True)
     bullet_list(s, 7.02, 2.48, 5.25, [
+        "Check contrast and colour-vision simulation on the projected display.",
         "Run the three-task peer test with the author silent.",
         "Record answer correctness and time; fix the two main hesitations.",
         "Add real before/after screenshots and the iteration log.",
-        "Append the team's actual AI disclosure and one reasoned rejection, if applicable.",
-    ], size=14, gap=0.78, marker=ORANGE)
+        "Append the AI disclosure and one real, reasoned AI-suggestion rejection.",
+    ], size=13.5, gap=0.68, marker=ORANGE)
     s.rect(0.95, 6.05, 11.4, 0.55, "FFF3D8")
     s.text(1.12, 6.12, 10.9, 0.34, "No usability findings or screenshot evidence are present in the current repository.", 12, INK, bold=True)
     footer(s, 7)
@@ -259,32 +262,7 @@ def write_pptx(slides):
                 target.writestr(name, source.read(name))
     return
 
-    ns = "http://schemas.openxmlformats.org/presentationml/2006/main"
-    content_types = ['<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>', '<Default Extension="xml" ContentType="application/xml"/>']
-    for n in range(1, len(slides) + 1):
-        content_types.append(f'<Override PartName="/ppt/slides/slide{n}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>')
-    content_types += ['<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>', '<Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>', '<Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>', '<Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>']
-    slide_ids = "".join(f'<p:sldId id="{256+n}" r:id="rId{n+1}"/>' for n in range(len(slides)))
-    presentation = f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="{ns}"><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:sldIdLst>{slide_ids}</p:sldIdLst><p:sldSz cx="12192000" cy="6858000"/><p:notesSz cx="6858000" cy="9144000"/><p:defaultTextStyle><a:defPPr><a:defRPr lang="en-US"/></a:defPPr></p:defaultTextStyle></p:presentation>'
-    pres_rels = ['<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>', '<Relationship Id="rId99" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>']
-    for n in range(1, len(slides) + 1):
-        pres_rels.append(f'<Relationship Id="rId{n+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{n}.xml"/>')
-    master = f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="{ns}"><p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld><p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/><p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst><p:txStyles><p:titleStyle/><p:bodyStyle/><p:otherStyle/></p:txStyles></p:sldMaster>'
-    layout = f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="{ns}" type="blank" preserve="1"><p:cSld name="Blank"><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>'
-    theme = f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="BISL504"><a:themeElements><a:clrScheme name="BISL504"><a:dk1><a:srgbClr val="{NAVY}"/></a:dk1><a:lt1><a:srgbClr val="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="{INK}"/></a:dk2><a:lt2><a:srgbClr val="{PAPER}"/></a:lt2><a:accent1><a:srgbClr val="{BLUE}"/></a:accent1><a:accent2><a:srgbClr val="{ORANGE}"/></a:accent2><a:accent3><a:srgbClr val="{GREEN}"/></a:accent3><a:accent4><a:srgbClr val="{MUTED}"/></a:accent4><a:accent5><a:srgbClr val="B7C9D7"/></a:accent5><a:accent6><a:srgbClr val="EAF2F7"/></a:accent6><a:hlink><a:srgbClr val="0563C1"/></a:hlink><a:folHlink><a:srgbClr val="954F72"/></a:folHlink></a:clrScheme><a:fontScheme name="Aptos"><a:majorFont><a:latin typeface="Aptos Display"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Aptos"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme><a:fmtScheme name="Office"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="50000"/><a:satMod val="300000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="50000"/><a:satMod val="200000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="16200000" scaled="1"/></a:gradFill><a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="15000"/><a:satMod val="350000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="85000"/><a:satMod val="100000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="16200000" scaled="1"/></a:gradFill></a:fillStyleLst><a:lnStyleLst><a:ln w="6350" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln><a:ln w="12700" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln><a:ln w="19050" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"><a:tint val="95000"/><a:satMod val="170000"/></a:schemeClr></a:solidFill><a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="80000"/><a:satMod val="300000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="30000"/><a:satMod val="200000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="16200000" scaled="1"/></a:gradFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements></a:theme>'
-    with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">{"".join(content_types)}</Types>')
-        z.writestr("_rels/.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/></Relationships>')
-        z.writestr("ppt/presentation.xml", presentation)
-        z.writestr("ppt/_rels/presentation.xml.rels", f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{"".join(pres_rels)}</Relationships>')
-        z.writestr("ppt/slideMasters/slideMaster1.xml", master)
-        z.writestr("ppt/slideMasters/_rels/slideMaster1.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>')
-        z.writestr("ppt/slideLayouts/slideLayout1.xml", layout)
-        z.writestr("ppt/slideLayouts/_rels/slideLayout1.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/></Relationships>')
-        z.writestr("ppt/theme/theme1.xml", theme)
-        for n, slide in enumerate(slides, 1):
-            z.writestr(f"ppt/slides/slide{n}.xml", slide.xml())
-            z.writestr(f"ppt/slides/_rels/slide{n}.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>')
+
 
 
 if __name__ == "__main__":
